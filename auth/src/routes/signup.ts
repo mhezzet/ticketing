@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express'
-import { body, validationResult } from 'express-validator'
-import { RequestValidationError, BadRequestError } from '../errors'
+import { body } from 'express-validator'
+import jwt from 'jsonwebtoken'
+import { BadRequestError } from '../errors'
+import { validateRequest } from '../middlewares/validate-request'
 import { User } from '../models'
 
 const router = express.Router()
@@ -15,14 +17,8 @@ const validationSchema = [
 
 router.post(
   '/api/users/signup',
-  [...validationSchema],
+  validateRequest(validationSchema),
   async (req: Request, res: Response) => {
-    const errors = validationResult(req)
-
-    if (!errors.isEmpty()) {
-      throw new RequestValidationError(errors.array())
-    }
-
     const { email, password } = req.body
 
     let user = await User.findOne({ email })
@@ -30,6 +26,18 @@ router.post(
 
     user = User.build({ email, password })
     await user.save()
+
+    const userJwt = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      process.env.JWT_KEY!
+    )
+
+    req.session = {
+      jwt: userJwt,
+    }
 
     res.status(201).send(user)
   }
