@@ -1,8 +1,7 @@
+import { BadRequestError, validateRequest } from '@gittexing/common'
 import express, { Request, Response } from 'express'
 import { body } from 'express-validator'
 import jwt from 'jsonwebtoken'
-import { BadRequestError } from '../errors'
-import { validateRequest } from '../middlewares/validate-request'
 import { User } from '../models'
 import { Password } from '../services/password'
 
