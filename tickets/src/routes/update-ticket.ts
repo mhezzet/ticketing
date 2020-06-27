@@ -1,4 +1,10 @@
-import { currentUser, requireAuth, validateRequest } from '@gittexing/common'
+import {
+  currentUser,
+  requireAuth,
+  validateRequest,
+  NotFoundError,
+  NotAuthorizedError,
+} from '@gittexing/common'
 import express, { Request, Response } from 'express'
 import { body } from 'express-validator'
 import { Ticket } from '../models'
@@ -12,13 +18,26 @@ const validationSchema = [
     .withMessage('price must be greater than zero'),
 ]
 
-router.post(
+router.put(
   '/api/tickets/:id',
   currentUser,
   requireAuth,
   validateRequest(validationSchema),
   async (req: Request, res: Response) => {
     const { title, price } = req.body
+
+    const ticket = await Ticket.findById(req.params.id)
+    if (!ticket) throw new NotFoundError()
+    if (req.currentUser?.id !== ticket.userId) throw new NotAuthorizedError()
+
+    ticket.set({
+      title,
+      price,
+    })
+
+    await ticket.save()
+
+    res.send(ticket)
   }
 )
 
