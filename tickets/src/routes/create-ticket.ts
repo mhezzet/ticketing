@@ -2,6 +2,8 @@ import { currentUser, requireAuth, validateRequest } from '@gittexing/common'
 import express, { Request, Response } from 'express'
 import { body } from 'express-validator'
 import { Ticket } from '../models'
+import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher'
+import { natsClient } from '../nats-client'
 
 const router = express.Router()
 
@@ -27,6 +29,13 @@ router.post(
     })
 
     await ticket.save()
+
+    await new TicketCreatedPublisher(natsClient.client).publish({
+      id: ticket.id,
+      title: ticket.title,
+      price: ticket.price,
+      userId: ticket.userId,
+    })
 
     res.status(201).send(ticket)
   }

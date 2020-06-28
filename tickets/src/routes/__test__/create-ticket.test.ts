@@ -1,6 +1,7 @@
 import request from 'supertest'
 import { app } from '../../app'
 import { Ticket } from '../../models'
+import { natsClient } from '../../nats-client'
 
 it('there is a route listening to /api/tickets for post requests', async () => {
   const response = await request(app).post('/api/tickets')
@@ -75,4 +76,17 @@ it('creates a ticket with valid inputs', async () => {
   tickets = await Ticket.find({})
 
   expect(tickets.length).toEqual(1)
+})
+
+it('publishes an event', async () => {
+  await request(app)
+    .post('/api/tickets')
+    .set('Cookie', global.signin())
+    .send({
+      title: 'asdasd',
+      price: 123,
+    })
+    .expect(201)
+
+  expect(natsClient.client.publish).toHaveBeenCalled()
 })
