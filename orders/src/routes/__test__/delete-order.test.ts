@@ -3,10 +3,12 @@ import { app } from '../../app'
 import { Ticket } from '../../models/ticket'
 import { Order } from '../../models/order'
 import { OrderStatus } from '@gittexing/common'
+import mongoose from 'mongoose'
 
 it('marks an order as cancelled', async () => {
   // create a ticket with Ticket Model
   const ticket = Ticket.build({
+    id: mongoose.Types.ObjectId().toHexString(),
     title: 'concert',
     price: 20,
   })

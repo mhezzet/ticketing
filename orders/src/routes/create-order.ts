@@ -9,9 +9,9 @@ import {
 import express, { Request, Response } from 'express'
 import { body } from 'express-validator'
 import { Order, Ticket } from '../models'
-import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher'
 import { natsClient } from '../nats-client'
 import mongoose from 'mongoose'
+import { OrderCreatedPublisher } from '../events/publishers/order-created-publisher'
 
 const router = express.Router()
 
@@ -48,6 +48,18 @@ router.post(
       ticket,
     })
     await order.save()
+
+    new OrderCreatedPublisher(natsClient.client).publish({
+      expiresAt: order.expiresAt.toISOString(),
+      version: order.version,
+      userId: order.userId,
+      status: OrderStatus.Created,
+      id: order.id,
+      ticket: {
+        id: order.ticket.id,
+        price: order.ticket.price,
+      },
+    })
 
     res.status(201).send(order)
   }

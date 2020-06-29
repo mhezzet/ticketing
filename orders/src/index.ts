@@ -1,6 +1,9 @@
 import mongoose from 'mongoose'
 import { app } from './app'
 import { natsClient } from './nats-client'
+import { TicketCreatedListener } from './events/listeners/ticket-created-listener'
+import { TicketUpdatedListener } from './events/listeners/ticket-updated.listener'
+import { Ticket } from './models'
 
 if (!process.env.JWT_KEY) {
   throw new Error('JWT_KEY must be defined')
@@ -41,6 +44,9 @@ mongoose
       console.log('NATS connection closed')
       process.exit()
     })
+
+    new TicketCreatedListener(natsClient.client).listen()
+    new TicketUpdatedListener(natsClient.client).listen()
 
     process.on('SIGINT', () => natsClient.client.close())
     process.on('SIGTERM', () => natsClient.client.close())

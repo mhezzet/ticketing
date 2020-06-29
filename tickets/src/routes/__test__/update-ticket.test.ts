@@ -1,6 +1,6 @@
+import mongoose from 'mongoose'
 import request from 'supertest'
 import { app } from '../../app'
-import mongoose from 'mongoose'
 import { natsClient } from '../../nats-client'
 
 it('return 404 if the provided id does not exist', async () => {

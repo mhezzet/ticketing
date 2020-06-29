@@ -1,14 +1,14 @@
 import {
   currentUser,
+  NotAuthorizedError,
+  NotFoundError,
   requireAuth,
   validateRequest,
-  NotFoundError,
-  NotAuthorizedError,
 } from '@gittexing/common'
 import express, { Request, Response } from 'express'
 import { body } from 'express-validator'
+import { TicketUpdatePublisher } from '../events/publishers/ticket-update-publisher'
 import { Ticket } from '../models'
-import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher'
 import { natsClient } from '../nats-client'
 
 const router = express.Router()
@@ -39,11 +39,12 @@ router.put(
 
     await ticket.save()
 
-    await new TicketCreatedPublisher(natsClient.client).publish({
+    await new TicketUpdatePublisher(natsClient.client).publish({
       id: ticket.id,
       title: ticket.title,
       price: ticket.price,
       userId: ticket.userId,
+      version: ticket.version,
     })
 
     res.send(ticket)

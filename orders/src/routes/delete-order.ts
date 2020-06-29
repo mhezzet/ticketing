@@ -7,6 +7,8 @@ import {
 } from '@gittexing/common'
 import express, { Request, Response } from 'express'
 import { Order } from '../models'
+import { OrderCancelledPublisher } from '../events/publishers/order-cancelled-publisher'
+import { natsClient } from '../nats-client'
 
 const router = express.Router()
 
@@ -24,6 +26,14 @@ router.delete(
     order.status = OrderStatus.Cancelled
 
     await order.save()
+
+    new OrderCancelledPublisher(natsClient.client).publish({
+      id: order.id,
+      version: order.version,
+      ticket: {
+        id: order.ticket.id,
+      },
+    })
 
     res.status(204).send(order)
   }
