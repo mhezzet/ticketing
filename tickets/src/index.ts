@@ -1,6 +1,8 @@
 import mongoose from 'mongoose'
 import { app } from './app'
 import { natsClient } from './nats-client'
+import { OrderCancelledListener } from './events/listeners/order-cancelled-listener'
+import { OrderCreatedListener } from './events/listeners/order-created-listener'
 
 if (!process.env.JWT_KEY) {
   throw new Error('JWT_KEY must be defined')
@@ -37,6 +39,9 @@ mongoose
     )
   })
   .then(() => {
+    new OrderCancelledListener(natsClient.client).listen()
+    new OrderCreatedListener(natsClient.client).listen()
+
     natsClient.client.on('close', () => {
       console.log('NATS connection closed')
       process.exit()
