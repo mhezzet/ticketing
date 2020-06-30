@@ -1,11 +1,8 @@
 import mongoose from 'mongoose'
 import { app } from './app'
 import { natsClient } from './nats-client'
-import { TicketCreatedListener } from './events/listeners/ticket-created-listener'
-import { TicketUpdatedListener } from './events/listeners/ticket-updated.listener'
-import { Ticket } from './models'
-import { PaymentCreatedListener } from './events/listeners/payment-created-listener'
-import { ExpirationCompleteListener } from './events/listeners/expiration-complete-listener'
+import { OrderCancelledListener } from './events/listeners/order-cancelled-listener'
+import { OrderCreatedListener } from './events/listeners/order-created-listener'
 
 if (!process.env.JWT_KEY) {
   throw new Error('JWT_KEY must be defined')
@@ -47,13 +44,11 @@ mongoose
       process.exit()
     })
 
-    new TicketCreatedListener(natsClient.client).listen()
-    new TicketUpdatedListener(natsClient.client).listen()
-    new PaymentCreatedListener(natsClient.client).listen()
-    new ExpirationCompleteListener(natsClient.client).listen()
-
     process.on('SIGINT', () => natsClient.client.close())
     process.on('SIGTERM', () => natsClient.client.close())
+
+    new OrderCancelledListener(natsClient.client).listen()
+    new OrderCreatedListener(natsClient.client).listen()
 
     app.listen(3000, () => console.log('🧇listening on port 3000!'))
   })
