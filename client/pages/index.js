@@ -4,7 +4,7 @@ import buildClient from '../api/buildClient'
 import Link from 'next/link'
 
 function Landing({ currentUser, tickets }) {
-  console.log('tickets', tickets)
+  console.log('hello tickets')
 
   const ticketList = tickets.map((ticket) => (
     <tr key={ticket.id}>

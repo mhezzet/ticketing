@@ -9,7 +9,7 @@ if (!process.env.MONGO_URI) {
   throw new Error('MONGO_URI must be defined')
 }
 
-console.log('starting...')
+console.log('starting....')
 
 mongoose
   .connect(process.env.MONGO_URI, {

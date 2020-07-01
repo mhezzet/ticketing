@@ -13,6 +13,8 @@ if (!process.env.NATS_CLUSER_ID) {
   throw new Error('NATS_CLUSER_ID must be defined')
 }
 
+console.log('starting....')
+
 natsClient
   .connect(
     process.env.NATS_CLUSER_ID!,
