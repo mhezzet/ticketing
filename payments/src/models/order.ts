@@ -52,6 +52,6 @@ orderSchema.plugin(updateIfCurrentPlugin)
 
 orderSchema.statics.build = (attrs: OrderAttrs) => new Order(attrs)
 
-const Order = mongoose.model<OrderDoc, OrderModel>('User', orderSchema)
+const Order = mongoose.model<OrderDoc, OrderModel>('Order', orderSchema)
 
 export { Order }

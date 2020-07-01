@@ -3,7 +3,6 @@ import { app } from './app'
 import { natsClient } from './nats-client'
 import { TicketCreatedListener } from './events/listeners/ticket-created-listener'
 import { TicketUpdatedListener } from './events/listeners/ticket-updated.listener'
-import { Ticket } from './models'
 import { PaymentCreatedListener } from './events/listeners/payment-created-listener'
 import { ExpirationCompleteListener } from './events/listeners/expiration-complete-listener'
 

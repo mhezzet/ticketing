@@ -39,6 +39,9 @@ const paymentSchema = new mongoose.Schema(
 
 paymentSchema.statics.build = (attrs: PaymentAttrs) => new Payment(Payment)
 
-const Payment = mongoose.model<PaymentDoc, PaymentModel>('User', paymentSchema)
+const Payment = mongoose.model<PaymentDoc, PaymentModel>(
+  'Payment',
+  paymentSchema
+)
 
 export { Payment }

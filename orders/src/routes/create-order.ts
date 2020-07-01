@@ -49,7 +49,7 @@ router.post(
     })
     await order.save()
 
-    new OrderCreatedPublisher(natsClient.client).publish({
+    await new OrderCreatedPublisher(natsClient.client).publish({
       expiresAt: order.expiresAt.toISOString(),
       version: order.version,
       userId: order.userId,
